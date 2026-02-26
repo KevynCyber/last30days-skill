@@ -919,6 +919,8 @@ Scored on groundedness (30%), specificity (25%), coverage (20%), actionability (
 
 HN items go through the same scoring pipeline as every other source and participate in cross-source linking. When the same topic appears on HN AND Reddit AND YouTube, that convergence gets flagged.
 
+Inspired by community PRs from [@ARJ999](https://github.com/ARJ999) ([#12](https://github.com/mvanhorn/last30days-skill/pull/12)) and [@wkbaran](https://github.com/wkbaran) ([#26](https://github.com/mvanhorn/last30days-skill/pull/26)), with [@gbessoni](https://github.com/gbessoni) endorsing HN as the right addition.
+
 ### X handle resolution details
 
 The problem: when you search a topic on X, you find posts *about* it. But the topic's own account often doesn't mention its own name in tweets. Keyword search can't find those posts.
