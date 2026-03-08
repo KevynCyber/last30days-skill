@@ -1,8 +1,8 @@
 /**
  * Browser cookie extraction for Twitter authentication.
- * Delegates to @steipete/sweet-cookie for Safari/Chrome/Firefox reads.
+ * Uses our own cookie-reader (no third-party dependencies).
  */
-import { getCookies } from '@steipete/sweet-cookie';
+import { getCookies } from './cookie-reader.js';
 const TWITTER_COOKIE_NAMES = ['auth_token', 'ct0'];
 const TWITTER_URL = 'https://x.com/';
 const TWITTER_ORIGINS = ['https://x.com/', 'https://twitter.com/'];
