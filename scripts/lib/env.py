@@ -139,7 +139,12 @@ def get_codex_access_token() -> tuple[Optional[str], str]:
 
 
 def get_openai_auth(file_env: Dict[str, str]) -> OpenAIAuth:
-    """Resolve OpenAI auth from API key or Codex login."""
+    """Resolve OpenAI auth from API key or Codex login.
+
+    Note: When OPENAI_API_KEY is not set, this falls back to reading
+    ~/.codex/auth.json (Codex CLI credentials). Set OPENAI_API_KEY explicitly
+    to avoid implicit Codex credential usage.
+    """
     api_key = os.environ.get('OPENAI_API_KEY') or file_env.get('OPENAI_API_KEY')
     if api_key:
         return OpenAIAuth(

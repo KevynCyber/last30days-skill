@@ -146,18 +146,26 @@ export async function resolveCredentials(options) {
         cookies.cookieHeader = cookieHeader(cookies.authToken, cookies.ct0);
         return { cookies, warnings };
     }
-    const sourcesToTry = resolveSources(options.cookieSource);
-    for (const source of sourcesToTry) {
-        const res = await readTwitterCookiesFromBrowser({
-            source,
-            chromeProfile: options.chromeProfile,
-            firefoxProfile: options.firefoxProfile,
-            cookieTimeoutMs,
-        });
-        warnings.push(...res.warnings);
-        if (res.cookies.authToken && res.cookies.ct0) {
-            return { cookies: res.cookies, warnings };
+    // Only attempt browser cookie extraction if explicitly opted in via
+    // BIRD_ALLOW_BROWSER_COOKIES=1. This prevents silent access to OS keystore
+    // (DPAPI/Keychain/keyring) without user awareness.
+    const allowBrowserCookies = process.env.BIRD_ALLOW_BROWSER_COOKIES === '1';
+    if (allowBrowserCookies) {
+        const sourcesToTry = resolveSources(options.cookieSource);
+        for (const source of sourcesToTry) {
+            const res = await readTwitterCookiesFromBrowser({
+                source,
+                chromeProfile: options.chromeProfile,
+                firefoxProfile: options.firefoxProfile,
+                cookieTimeoutMs,
+            });
+            warnings.push(...res.warnings);
+            if (res.cookies.authToken && res.cookies.ct0) {
+                return { cookies: res.cookies, warnings };
+            }
         }
+    } else if (!cookies.authToken || !cookies.ct0) {
+        warnings.push('Browser cookie extraction disabled. Set AUTH_TOKEN/CT0 env vars, or set BIRD_ALLOW_BROWSER_COOKIES=1 to allow browser cookie access.');
     }
     if (!cookies.authToken) {
         warnings.push('Missing auth_token - provide via --auth-token, AUTH_TOKEN env var, or login to x.com in Safari/Chrome/Firefox');

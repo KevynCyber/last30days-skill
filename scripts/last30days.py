@@ -1747,16 +1747,21 @@ def main():
     # Auto-save raw research to file if --save-dir is set
     if args.save_dir:
         import re
-        save_dir = Path(args.save_dir).expanduser()
-        save_dir.mkdir(parents=True, exist_ok=True)
-        slug = re.sub(r'[^a-z0-9]+', '-', args.topic.lower()).strip('-')[:60]
-        save_path = save_dir / f"{slug}-raw.md"
-        if save_path.exists():
-            save_path = save_dir / f"{slug}-raw-{datetime.now().strftime('%Y-%m-%d')}.md"
-        content = render.render_compact(report, missing_keys=missing_keys)
-        content += "\n" + render.render_source_status(report, source_info)
-        save_path.write_text(content, encoding="utf-8")
-        print(f"📎 {save_path}", file=sys.stderr)
+        save_dir = Path(args.save_dir).expanduser().resolve()
+        home_dir = Path.home().resolve()
+        if not str(save_dir).startswith(str(home_dir)):
+            print(f"⚠️  --save-dir must be within home directory ({home_dir}), skipping save", file=sys.stderr)
+            save_dir = None
+        if save_dir:
+            save_dir.mkdir(parents=True, exist_ok=True)
+            slug = re.sub(r'[^a-z0-9]+', '-', args.topic.lower()).strip('-')[:60]
+            save_path = save_dir / f"{slug}-raw.md"
+            if save_path.exists():
+                save_path = save_dir / f"{slug}-raw-{datetime.now().strftime('%Y-%m-%d')}.md"
+            content = render.render_compact(report, missing_keys=missing_keys)
+            content += "\n" + render.render_source_status(report, source_info)
+            save_path.write_text(content, encoding="utf-8")
+            print(f"📎 {save_path}", file=sys.stderr)
 
     # Persist findings to SQLite if requested
     if args.store:
